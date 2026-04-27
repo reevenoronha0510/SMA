@@ -1,0 +1,78 @@
+import pandas as pd
+import re
+import string
+import unicodedata
+from textblob import TextBlob
+from collections import Counter
+
+df = pd.read_csv("train.csv")   # make sure train.csv is in same folder
+
+# If your text column name is different, change here
+TEXT_COLUMN = "tweet"
+
+
+# CLEANING FUNCTION
+def clean_text(text):
+    text = str(text).lower()
+
+    # Remove URLs
+    text = re.sub(r"http\S+|www\S+|https\S+", "", text)
+
+    # Remove HTML tags
+    text = re.sub(r"<.*?>", "", text)
+
+    # Remove mentions (@user)
+    text = re.sub(r"@\w+", "", text)
+
+    # Remove hashtags symbol but keep word (#happy -> happy)
+    text = re.sub(r"#", "", text)
+
+    # Remove emojis
+    text = unicodedata.normalize('NFKD', text).encode('ascii', 'ignore').decode('utf-8', 'ignore')
+
+    # Remove numbers
+    text = re.sub(r"\d+", "", text)
+
+    # Remove punctuation & special characters
+    text = text.translate(str.maketrans("", "", string.punctuation))
+
+    # Remove any remaining non-letter characters
+    text = re.sub(r"[^a-z\s]", "", text)
+
+    # Remove repeated letters (soooo -> soo)
+    text = re.sub(r"(.)\1{2,}", r"\1\1", text)
+
+    # Remove extra spaces
+    text = re.sub(r"\s+", " ", text).strip()
+
+    return text
+
+# Apply cleaning
+df["clean_text"] = df[TEXT_COLUMN].apply(clean_text)
+
+# SENTIMENT FUNCTION
+def get_sentiment(text):
+    polarity = TextBlob(text).sentiment.polarity
+    
+    if polarity > 0:
+        return "positive"
+    elif polarity < 0:
+        return "negative"
+    else:
+        return "neutral"
+
+# Apply sentiment analysis
+df["sentiment"] = df["clean_text"].apply(get_sentiment)
+
+# COUNT SENTIMENT
+counts = Counter(df["sentiment"])
+
+print("\nSentiment Count:")
+print("Positive :", counts["positive"])
+print("Negative :", counts["negative"])
+print("Neutral  :", counts["neutral"])
+
+# SAVE UPDATED DATASET
+df.to_csv("sentiment_output.csv", index=False)
+
+print("\nUpdated dataset saved as 'sentiment_output.csv'")
