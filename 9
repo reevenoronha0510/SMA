@@ -1,0 +1,127 @@
+# Scrape reviews (ALL 3 platforms)
+from google_play_scraper import reviews, Sort
+import pandas as pd
+import matplotlib.pyplot as plt
+
+apps = {
+    "ChatGPT": "com.openai.chatgpt",
+    "Gemini": "com.google.android.apps.bard",
+    "Chatsonic": "com.writesonic.chatsonic"
+}
+
+data = []
+
+print("\n" + "="*50)
+print(" SCRAPING REVIEWS ")
+print("="*50)
+
+for app_name, app_id in apps.items():
+    try:
+        result, _ = reviews(
+            app_id,
+            lang='en',
+            country='in',
+            sort=Sort.NEWEST,
+            count=200
+        )
+        for r in result:
+            data.append([app_name, r['content']])
+        print(f"{app_name} done")
+    except Exception as e:
+        print(f"{app_name} failed :", e)
+
+df = pd.DataFrame(data, columns=["Platform", "Text"])
+
+print("\n" + "="*50)
+print(" SAMPLE DATA ")
+print("="*50)
+print(df.head())
+
+
+# Clean text
+import re
+
+def clean_text(text):
+    text = text.lower()
+    text = re.sub(r"http\S+", "", text)
+    text = re.sub(r"[^a-zA-Z\s]", "", text)
+    return text
+
+df["Clean_Text"] = df["Text"].apply(clean_text)
+
+print("\n" + "="*50)
+print(" CLEANED TEXT SAMPLE ")
+print("="*50)
+print(df[["Text", "Clean_Text"]].head())
+
+
+# Sentiment Analysis
+import nltk
+from nltk.sentiment import SentimentIntensityAnalyzer
+
+nltk.download('vader_lexicon')
+
+sia = SentimentIntensityAnalyzer()
+
+def get_sentiment(text):
+    score = sia.polarity_scores(text)["compound"]
+    if score > 0.05:
+        return "Positive"
+    elif score < -0.05:
+        return "Negative"
+    else:
+        return "Neutral"
+
+df["Sentiment"] = df["Clean_Text"].apply(get_sentiment)
+
+print("\n" + "="*50)
+print(" SENTIMENT ASSIGNED ")
+print("="*50)
+print(df[["Clean_Text", "Sentiment"]].head())
+
+
+# Count sentiments
+sentiment_counts = df.groupby(["Platform", "Sentiment"]).size().unstack().fillna(0)
+
+print("\n" + "="*50)
+print(" SENTIMENT COUNT ")
+print("="*50)
+print(sentiment_counts)
+
+
+# Convert to percentage
+sentiment_percent = sentiment_counts.div(sentiment_counts.sum(axis=1), axis=0) * 100
+
+print("\n" + "="*50)
+print(" SENTIMENT PERCENTAGE (%) ")
+print("="*50)
+print(sentiment_percent.round(2))
+
+
+# Plot comparative bar graph
+print("\n" + "="*50)
+print(" BAR GRAPH OUTPUT ")
+print("="*50)
+
+sentiment_percent.plot(kind="bar")
+plt.title("Sentiment Comparison: ChatGPT vs Gemini vs Chatsonic")
+plt.xlabel("Platform")
+plt.ylabel("Percentage")
+plt.xticks(rotation=0)
+plt.show()
+
+
+# Line Chart
+print("\n" + "="*50)
+print(" LINE CHART OUTPUT ")
+print("="*50)
+
+sentiment_percent = sentiment_percent[["Negative", "Neutral", "Positive"]]
+
+sentiment_percent.T.plot(marker='o')
+plt.title("Sentiment Comparison (Line Chart)")
+plt.xlabel("Sentiment Type")
+plt.ylabel("Percentage")
+plt.legend(title="Platform")
+plt.grid()
+plt.show()
