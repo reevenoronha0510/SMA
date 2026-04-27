@@ -1,0 +1,74 @@
+# Step 1
+!pip install google-play-scraper nltk matplotlib pandas
+
+# Step 2
+from google_play_scraper import reviews, Sort
+import pandas as pd
+import re
+import nltk
+from nltk.sentiment import SentimentIntensityAnalyzer
+import matplotlib.pyplot as plt
+
+nltk.download('vader_lexicon')
+
+# Step 3: Scrape PlayStation App
+result, _ = reviews(
+    "com.scee.psxandroid",
+    lang='en',
+    country='in',
+    sort=Sort.NEWEST,
+    count=500
+)
+
+data = [r['content'] for r in result]
+df = pd.DataFrame(data, columns=["Review"])
+
+print("Total Reviews:", len(df))
+
+# Step 4: Clean
+def clean(text):
+    text = text.lower()
+    text = re.sub(r"http\S+", "", text)
+    text = re.sub(r"[^a-zA-Z\s]", "", text)
+    return text
+
+df["Clean"] = df["Review"].apply(clean)
+
+# Step 5: Sentiment
+sia = SentimentIntensityAnalyzer()
+
+def get_sentiment(text):
+    score = sia.polarity_scores(text)["compound"]
+    return "Negative" if score < -0.05 else "Other"
+
+df["Sentiment"] = df["Clean"].apply(get_sentiment)
+
+neg_df = df[df["Sentiment"] == "Negative"]
+
+print("Negative Reviews:", len(neg_df))
+
+features = {
+    "Performance": ["lag", "slow", "freeze", "delay"],
+    "Connectivity": ["network", "wifi", "connection", "server"],
+    "App Issues": ["crash", "bug", "error", "glitch"],
+    "Login Issues": ["login", "account", "signin"],
+    "Updates": ["update", "version"],
+    "User Experience": ["bad", "worst", "issue", "problem"]
+}
+
+feature_counts = {}
+
+for feature, words in features.items():
+    count = sum(
+        any(word in review for word in words)
+        for review in neg_df["Clean"]
+    )
+    feature_counts[feature] = count
+
+print("Feature Counts:", feature_counts)
+
+# Step 7: Plot
+plt.bar(feature_counts.keys(), feature_counts.values())
+plt.xticks(rotation=30)
+plt.title("Negative Review Analysis - PlayStation")
+plt.show()
