@@ -1,0 +1,124 @@
+# ===============================
+# Import Libraries
+# ===============================
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Load dataset
+df = pd.read_csv("social_media_vs_productivity.csv")
+
+print("First 5 rows:\n", df.head())
+
+
+# =====================================================
+# PART 1 — EXPLORATORY ANALYSIS (ONE COLUMN)
+# Column: actual_productivity_score
+# =====================================================
+
+col = df['actual_productivity_score']
+
+print("\n===== EXPLORATORY ANALYSIS (actual_productivity_score) =====")
+
+print("1. Mean:", col.mean())
+print("2. Median:", col.median())
+print("3. Mode:", col.mode()[0])
+print("4. Variance:", col.var())
+print("5. Standard Deviation:", col.std())
+print("6. Minimum:", col.min())
+print("7. Maximum:", col.max())
+print("8. Range:", col.max() - col.min())
+print("9. Skewness:", col.skew())
+print("10. Kurtosis:", col.kurt())
+
+
+# =====================================================
+# PART 2 — VISUALIZATION (10 DIFFERENT TYPES)
+# =====================================================
+
+print("\n===== VISUALIZATION =====")
+
+# 1 Scatter Plot — Social Media Time vs Productivity
+print("1. Scatter Plot — daily_social_media_time vs actual_productivity_score")
+plt.scatter(df['daily_social_media_time'], df['actual_productivity_score'])
+plt.xlabel("Daily Social Media Time")
+plt.ylabel("Actual Productivity Score")
+plt.title("Social Media Time vs Productivity")
+plt.show()
+
+
+# 2 Histogram — Productivity Distribution
+print("2. Histogram — actual_productivity_score distribution")
+plt.hist(df['actual_productivity_score'], bins=10)
+plt.title("Productivity Distribution")
+plt.xlabel("Actual Productivity Score")
+plt.show()
+
+
+# 3 Pie Chart — Social Platform Preference
+print("3. Pie Chart — social_platform_preference")
+df['social_platform_preference'].value_counts().plot.pie(autopct='%1.1f%%')
+plt.title("Social Platform Preference")
+plt.ylabel("")
+plt.show()
+
+
+# 4 Line Plot — Work Hours vs Breaks During Work
+print("4. Line Plot — work_hours_per_day vs breaks_during_work")
+sorted_df = df.sort_values(by="work_hours_per_day")
+plt.plot(sorted_df['work_hours_per_day'], sorted_df['breaks_during_work'])
+plt.xlabel("Work Hours Per Day")
+plt.ylabel("Breaks During Work")
+plt.title("Work Hours vs Breaks During Work")
+plt.show()
+
+
+# 5 Box Plot — Productivity by Job Type
+print("5. Box Plot — actual_productivity_score by job_type")
+sns.boxplot(x='job_type', y='actual_productivity_score', data=df)
+plt.xticks(rotation=45)
+plt.title("Productivity by Job Type")
+plt.show()
+
+
+# 6 Bar Plot — Sleep Hours vs Coffee Consumption
+print("6. Bar Plot — sleep_hours vs coffee_consumption_per_day")
+df['sleep_group'] = pd.cut(df['sleep_hours'], bins=5)
+df.groupby('sleep_group', observed=False)['coffee_consumption_per_day'].mean().plot(kind='bar')
+plt.xlabel("Sleep Hours Group")
+plt.ylabel("Average Coffee Consumption")
+plt.title("Sleep Hours vs Coffee Consumption")
+plt.xticks(rotation=45)
+plt.show()
+
+
+# 7 Heatmap — Correlation
+print("7. Heatmap — Correlation between numeric variables")
+sns.heatmap(df.corr(numeric_only=True), annot=True)
+plt.title("Correlation Heatmap")
+plt.show()
+
+
+# 8 Area Chart — Stress vs Productivity
+print("8. Area Chart — stress_level vs productivity")
+sorted_df = df.sort_values(by="stress_level")
+plt.fill_between(sorted_df['stress_level'], sorted_df['actual_productivity_score'], alpha=0.3)
+plt.xlabel("Stress Level")
+plt.ylabel("Productivity")
+plt.title("Stress vs Productivity")
+plt.show()
+
+
+# 9 Violin Plot — Productivity Distribution
+print("9. Violin Plot — Productivity Distribution")
+sns.violinplot(y=df['actual_productivity_score'])
+plt.title("Productivity Distribution Shape")
+plt.show()
+
+
+# 10 Density Plot (KDE) — Social Media Time Density
+print("10. Density Plot — daily_social_media_time density")
+sns.kdeplot(df['daily_social_media_time'], fill=True)
+plt.title("Density of Social Media Time")
+plt.show()
