@@ -1,0 +1,210 @@
+EXPERIMENT 3 
+import re
+
+sentences = []
+
+print("Enter 5 sentences:\n")
+
+for i in range(5):
+    s = input(f"{i+1}: ")
+    sentences.append(s)
+
+def remove_urls(text):
+    return re.sub(r'http\S+|www\S+', '', text)
+
+def remove_user_mentions(text):
+    return re.sub(r'@\w+', '', text)
+
+def process_hashtags(text):
+    return re.sub(r'#(\w+)', r'\1', text)
+
+def remove_emojis(text):
+    emoji_pattern = re.compile(
+        "["  
+        "\U0001F600-\U0001F64F"
+        "\U0001F300-\U0001F5FF"
+        "\U0001F680-\U0001F6FF"
+        "\U0001F1E0-\U0001F1FF"
+        "]+",
+        flags=re.UNICODE
+    )
+    return emoji_pattern.sub('', text)
+
+def convert_to_lowercase(text):
+    return text.lower()
+
+def remove_special_chars_and_numbers(text):
+    return re.sub(r'[^a-zA-Z\s]', '', text)
+
+def remove_stopwords(text):
+    stopwords = {
+        'is','am','are','the','a','an','and','or','in','on','at','to',
+        'for','of','with','this','that','it','was','were','be','by'
+    }
+    words = text.split()
+    return ' '.join([word for word in words if word not in stopwords])
+
+def normalize_whitespace_and_repeated_chars(text):
+    text = re.sub(r'\s+', ' ', text).strip()
+    text = re.sub(r'(.)\1{2,}', r'\1\1', text)
+    return text
+
+def normalize_slang(text):
+    slang_dict = {
+        'u': 'you',
+        'ur': 'your',
+        'r': 'are',
+        'btw': 'by the way',
+        'gr8': 'great',
+        'luv': 'love'
+    }
+    words = text.split()
+    return ' '.join([slang_dict.get(word, word) for word in words])
+
+def print_step(title, data):
+    print("\n" + title)
+    for i, s in enumerate(data, 1):
+        print(f"{i}: {s}")
+
+print_step("Original Sentences:", sentences)
+
+step1 = [remove_urls(s) for s in sentences]
+print_step("After URL Removal:", step1)
+
+step2 = [remove_user_mentions(s) for s in step1]
+print_step("After User Mention Removal:", step2)
+
+step3 = [process_hashtags(s) for s in step2]
+print_step("After Hashtag Processing:", step3)
+
+step4 = [remove_emojis(s) for s in step3]
+print_step("After Emoji Removal:", step4)
+
+step5 = [convert_to_lowercase(s) for s in step4]
+print_step("After Lowercase Conversion:", step5)
+
+step6 = [remove_special_chars_and_numbers(s) for s in step5]
+print_step("After Special Character & Number Removal:", step6)
+
+step7 = [normalize_slang(s) for s in step6]
+print_step("After Slang Normalization:", step7)
+
+step8 = [remove_stopwords(s) for s in step7]
+print_step("After Stopword Removal:", step8)
+
+step9 = [normalize_whitespace_and_repeated_chars(s) for s in step8]
+print_step("After Whitespace & Repeated Character Normalization:", step9)
+
+print("\nPreprocessing completed.")
+print("Steps performed:")
+print("1. URL removal")
+print("2. User mention removal")
+print("3. Hashtag processing")
+print("4. Emoji removal")
+print("5. Lowercase conversion")
+print("6. Special character and number removal")
+print("7. Slang normalization")
+print("8. Stopword removal")
+print("9. Whitespace and repeated character normalization")
+
+
+
+
+
+
+
+
+
+
+
+
+
+Enter 5 sentences:
+
+1: I luv this product sooo much 😍😍!!! Visit https://shopnow.com for 50% OFF #Amazing
+2: Hey @john_doe u r coming to the party tonight??? btw bring    2 bottles 🍾🍾
+3: This dress is gr8 but price is 1999!!! Check www.fashionhub.com     #style #fashion
+4: Soooo happyyyy with my new PHONE 📱!!! Thankss @store for FAST DELIVERY!!!
+5: U should try this cafe, food is awesomeee 😍😍!!! Location: https://maps.google.com    #FoodieLife
+
+Original Sentences:
+1: I luv this product sooo much 😍😍!!! Visit https://shopnow.com for 50% OFF #Amazing
+2: Hey @john_doe u r coming to the party tonight??? btw bring    2 bottles 🍾🍾
+3: This dress is gr8 but price is 1999!!! Check www.fashionhub.com     #style #fashion
+4: Soooo happyyyy with my new PHONE 📱!!! Thankss @store for FAST DELIVERY!!!
+5: U should try this cafe, food is awesomeee 😍😍!!! Location: https://maps.google.com    #FoodieLife
+
+After URL Removal:
+1: I luv this product sooo much 😍😍!!! Visit  for 50% OFF #Amazing
+2: Hey @john_doe u r coming to the party tonight??? btw bring    2 bottles 🍾🍾
+3: This dress is gr8 but price is 1999!!! Check      #style #fashion
+4: Soooo happyyyy with my new PHONE 📱!!! Thankss @store for FAST DELIVERY!!!
+5: U should try this cafe, food is awesomeee 😍😍!!! Location:     #FoodieLife
+
+After User Mention Removal:
+1: I luv this product sooo much 😍😍!!! Visit  for 50% OFF #Amazing
+2: Hey  u r coming to the party tonight??? btw bring    2 bottles 🍾🍾
+3: This dress is gr8 but price is 1999!!! Check      #style #fashion
+4: Soooo happyyyy with my new PHONE 📱!!! Thankss  for FAST DELIVERY!!!
+5: U should try this cafe, food is awesomeee 😍😍!!! Location:     #FoodieLife
+
+After Hashtag Processing:
+1: I luv this product sooo much 😍😍!!! Visit  for 50% OFF Amazing
+2: Hey  u r coming to the party tonight??? btw bring    2 bottles 🍾🍾
+3: This dress is gr8 but price is 1999!!! Check      style fashion
+4: Soooo happyyyy with my new PHONE 📱!!! Thankss  for FAST DELIVERY!!!
+5: U should try this cafe, food is awesomeee 😍😍!!! Location:     FoodieLife
+
+After Emoji Removal:
+1: I luv this product sooo much !!! Visit  for 50% OFF Amazing
+2: Hey  u r coming to the party tonight??? btw bring    2 bottles 
+3: This dress is gr8 but price is 1999!!! Check      style fashion
+4: Soooo happyyyy with my new PHONE !!! Thankss  for FAST DELIVERY!!!
+5: U should try this cafe, food is awesomeee !!! Location:     FoodieLife
+
+After Lowercase Conversion:
+1: i luv this product sooo much !!! visit  for 50% off amazing
+2: hey  u r coming to the party tonight??? btw bring    2 bottles 
+3: this dress is gr8 but price is 1999!!! check      style fashion
+4: soooo happyyyy with my new phone !!! thankss  for fast delivery!!!
+5: u should try this cafe, food is awesomeee !!! location:     foodielife
+
+After Special Character & Number Removal:
+1: i luv this product sooo much  visit  for  off amazing
+2: hey  u r coming to the party tonight btw bring     bottles 
+3: this dress is gr but price is  check      style fashion
+4: soooo happyyyy with my new phone  thankss  for fast delivery
+5: u should try this cafe food is awesomeee  location     foodielife
+
+After Slang Normalization:
+1: i love this product sooo much visit for off amazing
+2: hey you are coming to the party tonight by the way bring bottles
+3: this dress is gr but price is check style fashion
+4: soooo happyyyy with my new phone thankss for fast delivery
+5: you should try this cafe food is awesomeee location foodielife
+
+After Stopword Removal:
+1: i love product sooo much visit off amazing
+2: hey you coming party tonight way bring bottles
+3: dress gr but price check style fashion
+4: soooo happyyyy my new phone thankss fast delivery
+5: you should try cafe food awesomeee location foodielife
+
+After Whitespace & Repeated Character Normalization:
+1: i love product soo much visit off amazing
+2: hey you coming party tonight way bring bottles
+3: dress gr but price check style fashion
+4: soo happyy my new phone thankss fast delivery
+5: you should try cafe food awesomee location foodielife
+
+Preprocessing completed.
+Steps performed:
+1. URL removal
+2. User mention removal
+3. Hashtag processing
+4. Emoji removal
+5. Lowercase conversion
+6. Special character and number removal
+7. Slang normalization
+8. Stopword removal
+9. Whitespace and repeated character normalization
