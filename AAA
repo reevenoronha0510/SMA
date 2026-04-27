@@ -1,0 +1,276 @@
+✅ EXPERIMENT 2 – Web Scraping
+
+🔹 Libraries
+import requests
+from bs4 import BeautifulSoup
+import csv
+🔹 Pseudocode
+START
+Set URL and headers
+Send HTTP request
+
+IF response is not 200:
+    STOP
+
+Parse HTML using BeautifulSoup
+Find all quote blocks
+
+FOR each block:
+    Extract quote text
+    Extract author
+    Extract likes
+    Store in list
+
+Display first few records
+
+Open CSV file
+Write header
+Write all data
+
+END
+
+
+
+✅ EXPERIMENT 3 – Data Cleaning
+
+🔹 Libraries
+import re
+🔹 Pseudocode
+START
+Input 5 sentences
+
+DEFINE functions:
+    remove URLs
+    remove mentions
+    process hashtags
+    remove emojis
+    convert to lowercase
+    remove special characters
+    normalize slang
+    remove stopwords
+    normalize whitespace
+
+Apply all steps sequentially:
+    Step1 → URL removal
+    Step2 → mention removal
+    Step3 → hashtag processing
+    Step4 → emoji removal
+    Step5 → lowercase
+    Step6 → special char removal
+    Step7 → slang normalization
+    Step8 → stopword removal
+    Step9 → whitespace normalization
+
+Display output after each step
+
+END
+
+
+
+✅ EXPERIMENT 4 – EDA & Visualization
+
+🔹 Libraries
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+🔹 Pseudocode
+START
+Load dataset using pandas
+
+Display first 5 rows
+
+Select productivity column
+
+Compute statistics:
+    mean, median, mode
+    variance, standard deviation
+    min, max, range
+    skewness, kurtosis
+
+Create graphs:
+    scatter plot
+    histogram
+    pie chart
+    line plot
+    box plot
+    bar plot
+    heatmap
+    area chart
+    violin plot
+    density plot
+
+Display all graphs
+
+END
+
+
+
+✅ EXPERIMENT 5 – Content-Based Sentiment Analysis
+
+🔹 Libraries
+import pandas as pd
+import re
+import string
+import unicodedata
+from textblob import TextBlob
+from collections import Counter
+🔹 Pseudocode
+START
+Load dataset (train.csv)
+
+DEFINE clean_text():
+    lowercase text
+    remove URLs and HTML
+    remove mentions and hashtags
+    remove emojis
+    remove numbers and punctuation
+    remove repeated characters
+    remove extra spaces
+
+Apply cleaning to dataset
+
+DEFINE get_sentiment():
+    calculate polarity using TextBlob
+    IF polarity > 0 → positive
+    IF polarity < 0 → negative
+    ELSE → neutral
+
+Apply sentiment analysis
+
+Count sentiment values
+
+Display counts
+
+Save updated dataset to CSV
+
+END
+
+
+
+✅ EXPERIMENT 6 – Structure-Based Graph Analysis
+
+🔹 Libraries
+import networkx as nx
+import matplotlib.pyplot as plt
+import scipy.io
+🔹 Pseudocode
+START
+Load graph from file
+
+Extract largest connected component
+
+Select top 50 nodes by degree
+
+Create subgraph
+
+Draw graph
+
+Print:
+    number of nodes
+    number of edges
+    graph density
+
+Display node degrees
+
+Compute centralities:
+    degree
+    betweenness
+    closeness
+    eigenvector
+
+Display top nodes for each centrality
+
+Find bridges
+Find top hubs
+
+END
+
+
+
+✅ EXPERIMENT 9 – Competitor Analysis
+
+🔹 Libraries
+from google_play_scraper import reviews, Sort
+import pandas as pd
+import matplotlib.pyplot as plt
+import re
+import nltk
+from nltk.sentiment import SentimentIntensityAnalyzer
+🔹 Pseudocode
+START
+Install required libraries
+
+Define apps (ChatGPT, Gemini, Chatsonic)
+
+FOR each app:
+    Scrape reviews
+    Store platform + review text
+
+Create DataFrame
+
+Clean text:
+    lowercase
+    remove URLs
+    remove special characters
+
+Download VADER lexicon
+
+DEFINE get_sentiment():
+    IF score > 0.05 → positive
+    IF score < -0.05 → negative
+    ELSE → neutral
+
+Apply sentiment analysis
+
+Group data by platform and sentiment
+Count values
+
+Convert to percentage
+
+Plot:
+    bar graph
+    line chart
+
+END
+
+
+
+✅ EXPERIMENT 10 – Product Improvement Analysis
+
+🔹 Libraries
+from google_play_scraper import reviews, Sort
+import pandas as pd
+import re
+import nltk
+from nltk.sentiment import SentimentIntensityAnalyzer
+import matplotlib.pyplot as plt
+🔹 Pseudocode
+START
+Install libraries
+
+Scrape app reviews
+
+Store in DataFrame
+
+Clean text:
+    lowercase
+    remove URLs
+    remove special characters
+
+Apply sentiment:
+    IF score < -0.05 → Negative
+    ELSE → Other
+
+Filter negative reviews
+
+Define feature categories with keywords
+
+FOR each feature:
+    Count matching reviews
+
+Store feature counts
+
+Plot bar chart
+
+END
