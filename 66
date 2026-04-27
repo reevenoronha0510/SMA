@@ -1,0 +1,126 @@
+import networkx as nx
+import matplotlib.pyplot as plt
+import scipy.io
+import numpy as np
+
+# ---------------- LOAD DATASET ----------------
+G_full = nx.from_scipy_sparse_array(
+    scipy.io.mmread("soc-youtube.mtx")
+)
+
+print("Total Nodes in Full Graph:", G_full.number_of_nodes())
+
+# ---------------- LARGEST CONNECTED COMPONENT ----------------
+largest_cc = max(nx.connected_components(G_full), key=len)
+G_lcc = G_full.subgraph(largest_cc).copy()
+
+print("Nodes in Largest Component:", G_lcc.number_of_nodes())
+
+# ---------------- SELECT 50 CONNECTED NODES ----------------
+start_node = list(G_lcc.nodes())[0]
+bfs_nodes = list(nx.bfs_tree(G_lcc, start_node).nodes())[:50]
+
+G = G_lcc.subgraph(bfs_nodes).copy()
+
+print("Nodes Selected:", G.number_of_nodes())
+print("Edges:", G.number_of_edges())
+
+# ---------------- VISUALIZATION ----------------
+plt.figure(figsize=(10, 8))
+pos = nx.spring_layout(G, seed=42)
+
+nx.draw(
+    G, pos,
+    with_labels=True,
+    node_size=300,
+    node_color="skyblue",
+    edge_color="gray",
+    font_size=8
+)
+
+plt.title("Connected Social Network (50 Nodes)")
+plt.show()
+
+# ---------------- BASIC STATS ----------------
+print("\nBasic Network Properties:")
+print("Number of Nodes:", G.number_of_nodes())
+print("Number of Edges:", G.number_of_edges())
+print("Density:", nx.density(G))
+
+# ---------------- DEGREE ----------------
+print("\nDegree of each node:")
+degree_dict = dict(G.degree())
+for node, degree in degree_dict.items():
+    print(node, ":", degree)
+
+# ---------------- DEGREE DISTRIBUTION ----------------
+degrees = [d for n, d in G.degree()]
+
+plt.hist(degrees, bins=10, edgecolor='black')
+plt.title("Degree Distribution")
+plt.xlabel("Degree")
+plt.ylabel("Frequency")
+plt.show()
+
+# ---------------- CLUSTERING COEFFICIENT ----------------
+avg_clustering = nx.average_clustering(G)
+print("\nAverage Clustering Coefficient:", avg_clustering)
+
+# ---------------- CENTRALITY ----------------
+degree_centrality = nx.degree_centrality(G)
+betweenness = nx.betweenness_centrality(G)
+closeness = nx.closeness_centrality(G)
+eigenvector = nx.eigenvector_centrality(G, max_iter=1000)
+
+print("\nDegree Centrality:")
+for node, value in degree_centrality.items():
+    print(node, ":", round(value, 4))
+
+print("\nBetweenness Centrality:")
+for node, value in betweenness.items():
+    print(node, ":", round(value, 4))
+
+print("\nCloseness Centrality:")
+for node, value in closeness.items():
+    print(node, ":", round(value, 4))
+
+print("\nEigenvector Centrality:")
+for node, value in eigenvector.items():
+    print(node, ":", round(value, 4))
+
+# ---------------- HUBS ----------------
+sorted_hubs = sorted(
+    degree_centrality.items(),
+    key=lambda x: x[1],
+    reverse=True
+)
+
+print("\nTop 5 Hubs:")
+for node, value in sorted_hubs[:5]:
+    print(node, ":", round(value, 4))
+
+# Highlight hubs
+top_hub_nodes = [node for node, _ in sorted_hubs[:5]]
+
+node_colors = []
+for node in G.nodes():
+    if node in top_hub_nodes:
+        node_colors.append("red")
+    else:
+        node_colors.append("skyblue")
+
+plt.figure(figsize=(10, 8))
+nx.draw(
+    G, pos,
+    with_labels=True,
+    node_color=node_colors,
+    node_size=300
+)
+
+plt.title("Hubs Highlighted in Red")
+plt.show()
+
+# ---------------- BRIDGES ----------------
+bridges = list(nx.bridges(G))
+print("\nBridges in Network:")
+print(bridges)
