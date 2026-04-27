@@ -1,3 +1,5 @@
+Aim: To develop social media text analytics models for improving existing products/services.
+
 # Step 1
 !pip install google-play-scraper nltk matplotlib pandas
 
